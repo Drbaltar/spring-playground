@@ -1,9 +1,9 @@
-package com.drbaltar.springplayground;
+package com.drbaltar.springplayground.textprocessing;
 
 import java.util.List;
 
 public class MathService {
-    static String addAll(List<String> qString) {
+    public static String addAll(List<String> qString) {
         StringBuilder output = new StringBuilder();
         int total = 0;
         for (int i = 0; i < qString.size(); i++) {

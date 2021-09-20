@@ -1,5 +1,6 @@
-package com.drbaltar.springplayground;
+package com.drbaltar.springplayground.controllers;
 
+import com.drbaltar.springplayground.textprocessing.MathService;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 

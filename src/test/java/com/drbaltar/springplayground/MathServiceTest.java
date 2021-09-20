@@ -1,5 +1,6 @@
 package com.drbaltar.springplayground;
 
+import com.drbaltar.springplayground.textprocessing.MathService;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

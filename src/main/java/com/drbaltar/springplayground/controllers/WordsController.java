@@ -1,4 +1,4 @@
-package com.drbaltar.springplayground;
+package com.drbaltar.springplayground.controllers;
 
 import com.drbaltar.springplayground.textprocessing.WordCounter;
 import org.springframework.web.bind.annotation.PostMapping;
