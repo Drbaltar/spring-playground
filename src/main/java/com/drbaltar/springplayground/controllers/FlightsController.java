@@ -1,5 +1,6 @@
 package com.drbaltar.springplayground.controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +47,7 @@ public class FlightsController {
         john.setLastName("Wilson");
 
         Calendar departs = Calendar.getInstance();
-        departs.set(2021, 8, 01);
+        departs.set(2021, 8, 1);
 
 
         Flight testflight = new Flight(departs);
@@ -79,8 +80,8 @@ public class FlightsController {
     }
 
     static class Ticket {
-        private Person passenger;
-        private double price;
+        private final Person passenger;
+        private final double price;
 
         public Ticket(Person passenger, double price) {
             this.passenger = passenger;
@@ -118,13 +119,10 @@ public class FlightsController {
             tickets.add(ticket);
         }
 
-
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "America/Chicago")
         @JsonProperty("Departs")
-        public String getDepartsInString() {
-            return departs.get(Calendar.YEAR) + "-" + departs.get(Calendar.MONTH)
-                    + "-" + departs.get(Calendar.DATE) + " " + departs.get(Calendar.HOUR_OF_DAY)
-                    + ":" + departs.get(Calendar.MINUTE);
-
+        public Calendar getDeparts() {
+            return departs;
         }
     }
 }

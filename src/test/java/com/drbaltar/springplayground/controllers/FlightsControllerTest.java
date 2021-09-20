@@ -65,7 +65,9 @@ public class FlightsControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[1].Tickets[0].Passenger.FirstName", is(notNullValue())))
+                .andExpect(jsonPath("$[1].Tickets[0].Passenger", not(hasProperty("LastName"))))
                 .andExpect(jsonPath("$[1].Tickets[0].Price", is(notNullValue())));
+
     }
 
 }
