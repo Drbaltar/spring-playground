@@ -1,6 +1,5 @@
 package com.drbaltar.springplayground.controllers;
 
-import com.drbaltar.springplayground.controllers.WordsController;
 import com.drbaltar.springplayground.textprocessing.WordCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

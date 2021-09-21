@@ -1,6 +1,5 @@
 package com.drbaltar.springplayground.textprocessing;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class WordCounter {

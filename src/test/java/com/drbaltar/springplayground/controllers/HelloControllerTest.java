@@ -1,6 +1,5 @@
 package com.drbaltar.springplayground.controllers;
 
-import com.drbaltar.springplayground.controllers.HelloController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
