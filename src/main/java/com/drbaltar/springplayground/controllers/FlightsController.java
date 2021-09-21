@@ -5,78 +5,64 @@ import com.drbaltar.springplayground.models.Person;
 import com.drbaltar.springplayground.models.Ticket;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 @RestController
 @RequestMapping("/flights")
 public class FlightsController {
 
-    @PostMapping("/tickets/total")
-    public Map<String, Integer> getTicketTotal(@RequestBody FlightWithoutDeparts flight) {
-        var total = 0;
-        for (Ticket ticket : flight.tickets) {
-            total += ticket.getPrice();
-        }
-
-        Map<String, Integer> results = new HashMap<>();
-        results.put("result", total);
-        return results;
-    }
-
     @GetMapping("/flight")
     public Flight getFlight() {
-        return getTestFlight();
+        return getTestFlight("John", "Wilson", 400);
     }
 
     @GetMapping
     public List<Flight> getFlights() {
-        List<Flight> flights = new ArrayList<>();
-
-        Person david = new Person();
-        david.setFirstName("David");
-
-        Calendar departs1 = Calendar.getInstance();
-        departs1.set(2021, Calendar.AUGUST, 2);
-
-
-        Flight testflight1 = new Flight(departs1);
-
-        testflight1.addTicket(new Ticket(david, 200));
-        flights.add(getTestFlight());
-        flights.add(testflight1);
-
-        return flights;
+        return getTestFlightList();
     }
 
-    private Flight getTestFlight() {
-        Person john = new Person();
-        john.setFirstName("John");
-        john.setLastName("Wilson");
+    @PostMapping("/tickets/total")
+    public CalculationResults getTicketTotal(@RequestBody Flight flight) {
+        return new CalculationResults(flight.calculateTicketTotals());
+    }
+
+    @PostMapping("/totals")
+    public CalculationResults getTotalCostFlights(@RequestBody ArrayList<Flight> flights) {
+        var total = 0;
+
+        for (Flight flight : flights)
+            total += flight.calculateTicketTotals();
+
+        return new CalculationResults(total);
+    }
+
+    private Flight getTestFlight(String firstName, String lastName, int price) {
+        Person passenger = new Person();
+        passenger.setFirstName(firstName);
+        passenger.setLastName(lastName);
 
         Calendar departs = Calendar.getInstance();
         departs.set(2021, Calendar.AUGUST, 1);
 
 
-        Flight testflight = new Flight(departs);
-        testflight.addTicket(new Ticket(john, 400));
+        Flight testflight = new Flight();
+        testflight.setDeparts(departs);
+        testflight.addTicket(new Ticket(passenger, price));
+
         return testflight;
     }
 
-    record FlightWithoutDeparts(ArrayList<Ticket> tickets) {
+    private List<Flight> getTestFlightList() {
+        List<Flight> flights = new ArrayList<>();
+
+        flights.add(getTestFlight("John", "Wilson", 400));
+        flights.add(getTestFlight("David", null, 200));
+
+        return flights;
     }
 
-    @PostMapping("/totals")
-    public Map<String, Integer> getTotalCostFlights(@RequestBody ArrayList<FlightWithoutDeparts> flights){
-        Map<String, Integer> grandTotal = new HashMap<>();
-        int total = 0;
-        for (FlightWithoutDeparts flight : flights) {
-            for (Ticket ticket : flight.tickets) {
-                total += ticket.getPrice();
-            }
-        }
-
-        grandTotal.put("result", total);
-        return grandTotal;
+    record CalculationResults(int result) {
     }
 }

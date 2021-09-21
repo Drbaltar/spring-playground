@@ -1,5 +1,6 @@
 package com.drbaltar.springplayground.controllers;
 
+import com.drbaltar.springplayground.models.Flight;
 import com.drbaltar.springplayground.models.Person;
 import com.drbaltar.springplayground.models.Ticket;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,8 +17,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,10 +29,26 @@ public class FlightsControllerTest {
     @Autowired
     MockMvc mvc;
 
+    private Flight getTestFlight() {
+        Person testPerson1 = new Person();
+        testPerson1.setFirstName("Some name");
+        testPerson1.setLastName("Some other name");
+        Person testPerson2 = new Person();
+        testPerson2.setFirstName("Name B");
+        testPerson2.setLastName("Name C");
+        Ticket ticket1 = new Ticket(testPerson1, 200);
+        Ticket ticket2 = new Ticket(testPerson2, 150);
 
+        var flight = new Flight();
+        flight.addTicket(ticket1);
+        flight.addTicket(ticket2);
+
+        return flight;
+    }
 
     @Nested
     class Flights {
+
 
         @Test
         public void testCreatPersonJSONClass() throws Exception {
@@ -119,65 +134,62 @@ public class FlightsControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.result", is(350)));
         }
-    }
-    @Test
-    void shouldReturnTotalWhenUsingObjectMapper() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
 
-        String json = mapper.writeValueAsString(getTestFlight());
-        RequestBuilder request = post("/flights/tickets/total")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+        @Test
+        void shouldReturnTotalWhenUsingObjectMapper() throws Exception {
+            ObjectMapper mapper = new ObjectMapper();
 
-        mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result", is(350)));
-    }
+            String json = mapper.writeValueAsString(getTestFlight());
+            RequestBuilder request = post("/flights/tickets/total")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json);
 
-    @Test
-    void shouldReturnTotalWhenUsingJSONFile() throws Exception {
-        String json = getJSON("/tickets.json");
+            mvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", is(350)));
+        }
 
-        RequestBuilder request = post("/flights/tickets/total")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+        @Test
+        void shouldReturnTotalWhenUsingJSONFile() throws Exception {
+            String json = getJSON("/tickets.json");
 
-        mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result", is(350)));
-    }
+            RequestBuilder request = post("/flights/tickets/total")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json);
 
-    private String getJSON(String path) throws Exception {
-        URL url = this.getClass().getResource(path);
-        return new String(Files.readAllBytes(Paths.get(url.getFile())));
-    }
+            mvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", is(350)));
+        }
 
-    @Test
-    void shouldReturnTotalForMultipleFlights() throws Exception {
-        ArrayList<HashMap<String, ArrayList<Ticket>>> scheduledFlights = new ArrayList<>();
-        scheduledFlights.add(getTestFlight());
-        scheduledFlights.add(getTestFlight());
+        private String getJSON(String path) throws Exception {
+            URL url = this.getClass().getResource(path);
+            return new String(Files.readAllBytes(Paths.get(url.getFile())));
+        }
 
-        ObjectMapper mapper = new ObjectMapper();
+        @Test
+        void shouldReturnTotalForMultipleFlights() throws Exception {
+            var scheduledFlights = new ArrayList<Flight>();
+            scheduledFlights.add(getTestFlight());
+            scheduledFlights.add(getTestFlight());
 
-        String json = mapper.writeValueAsString(scheduledFlights);
-        RequestBuilder request = post("/flights/totals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+            var mapper = new ObjectMapper();
 
-        mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result", is(700)));
+            var json = mapper.writeValueAsString(scheduledFlights);
+            RequestBuilder request = post("/flights/totals")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json);
 
+            mvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", is(700)));
+        }
 
-
-    }
-
-    @Test
-    void shouldReturnTotalWhenStringLiteralPassed() throws Exception {
-        RequestBuilder request = post("/flights/totals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        @Test
+        void shouldReturnTotalWhenStringLiteralPassedForMultipleFlights() throws Exception {
+            RequestBuilder request = post("/flights/totals")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
                               [{             
                                 "tickets": [
                                   {
@@ -216,28 +228,10 @@ public class FlightsControllerTest {
                               }]
                             """);
 
-        mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result", is(700)));
-    }
-
-    private HashMap<String, ArrayList<Ticket>> getTestFlight() {
-        Person testPerson1 = new Person();
-        testPerson1.setFirstName("Some name");
-        testPerson1.setLastName("Some other name");
-        Person testPerson2 = new Person();
-        testPerson2.setFirstName("Name B");
-        testPerson2.setLastName("Name C");
-        Ticket ticket1 = new Ticket(testPerson1, 200);
-        Ticket ticket2 = new Ticket(testPerson2, 150);
-        ArrayList<Ticket> ticketArray = new ArrayList<>();
-        ticketArray.add(ticket1);
-        ticketArray.add(ticket2);
-
-        HashMap<String, ArrayList<Ticket>> flight = new HashMap<>();
-        flight.put("tickets", ticketArray);
-
-        return flight;
+            mvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", is(700)));
+        }
     }
 }
 
